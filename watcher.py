@@ -4,7 +4,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from rich.console import Console
 from pathlib import Path
-from utils import extraer_mes_de_ruta, extraer_mes_de_nombre_archivo
+from utils import extraer_mes_de_ruta, extraer_mes_de_nombre_archivo, extraer_anio_de_ruta
 
 console = Console()
 
@@ -40,12 +40,16 @@ class ExcelHandler(FileSystemEventHandler):
             if not mes:
                 mes = extraer_mes_de_ruta(str(ruta))
             
+            # Extraer año de la ruta
+            anio = extraer_anio_de_ruta(str(ruta))
+            
             console.log(f"[cyan]📅 Mes detectado:[/] {mes}")
+            console.log(f"[cyan]📅 Año detectado:[/] {anio}")
             console.log(f"[cyan]📂 Ruta:[/] {ruta}")
             
-            # Ejecutar el procesamiento con archivo y mes
+            # Ejecutar el procesamiento con archivo, mes y año
             subprocess.run(
-                ["invoke", "procesar", "--archivo", str(ruta), "--mes", mes],
+                ["invoke", "procesar", "--archivo", str(ruta), "--mes", mes, "--anio", anio],
                 shell=True
             )
 

@@ -210,11 +210,16 @@ result_data = {
       rta_bacteriologia]
 }
 
-# Obtener el mes desde argumentos de línea de comandos
-if len(sys.argv) > 1:
+# Obtener el mes y año desde argumentos de línea de comandos
+if len(sys.argv) > 2:
     mes = sys.argv[1]
+    anio = sys.argv[2]
+elif len(sys.argv) > 1:
+    mes = sys.argv[1]
+    anio = input("Cual es el año en revision? ")
 else:
     mes = input("Cual es tu mes en revision? ")
+    anio = input("Cual es el año en revision? ")
 
 # Crear carpetas de salida si no existen
 #crear_carpetas_salida()
@@ -222,19 +227,19 @@ else:
 hallazgos_medicamentos = pd.DataFrame(result_data)
 
 try:
-      hallazgos_medicamentos.to_excel(f"Hallazgos/HALLAZGOS MES DE {mes.upper()} DE 2025.xlsx", index=False)
+      hallazgos_medicamentos.to_excel(f"Hallazgos/HALLAZGOS MES DE {mes.upper()} DE {anio}.xlsx", index=False)
       print("[OK] El archivo de hallazgos se exporto satisfactoriamente")
 except Exception as e:
       print(f"[ERROR] Al exportar hallazgos: {e}")
 
 try:
-      picos.to_excel(f"Hallazgos/analisis_cantidades/ANALISIS CANTIDADES MES DE {mes.upper()} DE 2025.xlsx", index=False)
+      picos.to_excel(f"Hallazgos/analisis_cantidades/ANALISIS CANTIDADES MES DE {mes.upper()} DE {anio}.xlsx", index=False)
       print("[OK] El archivo de analisis de cantidades se exporto satisfactoriamente")
 except Exception as e:
       print(f"[ERROR] Al exportar analisis de cantidades: {e}")
 
 try:
-      desfasados.to_excel(f"Hallazgos/variacion_costo/ANALISIS COSTO UNITARIO {mes.upper()} DE 2025.xlsx", index=False)
+      desfasados.to_excel(f"Hallazgos/variacion_costo/ANALISIS COSTO UNITARIO {mes.upper()} DE {anio}.xlsx", index=False)
       print("[OK] El archivo de analisis de costos se exporto satisfactoriamente")
 except Exception as e:
       print(f"[ERROR] Al exportar analisis de costos: {e}")

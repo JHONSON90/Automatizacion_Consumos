@@ -105,17 +105,22 @@ cirugia  = (df['origenMed'] == "SIMA") & (df['EspeNom'].isin(["CIRUGIA", "CIRUGI
 df.loc[cirugia, 'EspeNom'] = "CIRUGIA GENERAL"
 df.loc[cirugia, 'scc_Nombre'] = "MEDICINA ESPECIALIZADA"
 
-# Obtener el mes desde argumentos de línea de comandos
-if len(sys.argv) > 1:
+# Obtener el mes y año desde argumentos de línea de comandos
+if len(sys.argv) > 2:
     mes = sys.argv[1]
+    anio = sys.argv[2]
+elif len(sys.argv) > 1:
+    mes = sys.argv[1]
+    anio = input("Año a arreglar? ")
 else:
     mes = input("Mes a arreglar? ")
+    anio = input("Año a arreglar? ")
 
 # Crear carpetas de salida si no existen
 # crear_carpetas_salida()
 
 try:
-      df.to_excel(f"Arreglados/CONSUMO PACIENTES DEL MES DE {mes.upper()} DE 2025.xlsx", index=False)
+      df.to_excel(f"Arreglados/CONSUMO PACIENTES DEL MES DE {mes.upper()} DE {anio}.xlsx", index=False)
       print("[OK] El archivo arreglado se exporto satisfactoriamente")
 except Exception as e:
       print(f"[ERROR] al exportar el archivo: {e}")

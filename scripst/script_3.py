@@ -1,20 +1,32 @@
 import pandas as pd
 import sys
 from pathlib import Path
-from utils import crear_carpetas_salida, buscar_archivo_informe_consumos
 
-# Obtener el mes desde argumentos de línea de comandos
-if len(sys.argv) > 1:
+# Agregar el directorio raíz al path para poder importar utils
+root_path = Path(__file__).resolve().parent.parent
+if str(root_path) not in sys.path:
+    sys.path.append(str(root_path))
+
+from utils import buscar_archivo_informe_consumos
+
+
+# Obtener el mes y año desde argumentos de línea de comandos
+if len(sys.argv) > 2:
     mes = sys.argv[1].upper()
+    anio = sys.argv[2]
+elif len(sys.argv) > 1:
+    mes = sys.argv[1].upper()
+    anio = input("ingrese el año: ")
 else:
     mes = input("ingrese el mes: ").upper()
+    anio = input("ingrese el año: ")
 
 # Crear carpetas de salida si no existen
 #crear_carpetas_salida()
 
-# Buscar el archivo InformeConsumos correspondiente al mes
+# Buscar el archivo InformeConsumos correspondiente al mes y año
 try:
-    ruta_informe = buscar_archivo_informe_consumos(mes)
+    ruta_informe = buscar_archivo_informe_consumos(mes, anio)
     print(f"[OK] Usando InformeConsumos: {ruta_informe.name}")
 except FileNotFoundError as e:
     print(f"[ERROR]: {e}")
@@ -22,7 +34,7 @@ except FileNotFoundError as e:
     print("Por favor, asegúrese de que el archivo esté en la carpeta de Descargas.")
     sys.exit(1)
 
-consumo = pd.read_excel(f"Arreglados/CONSUMO PACIENTES DEL MES DE {mes} DE 2025.xlsx", sheet_name="Sheet1")
+consumo = pd.read_excel(f"Arreglados/CONSUMO PACIENTES DEL MES DE {mes} DE {anio}.xlsx", sheet_name="Sheet1")
 entradas = pd.read_excel(ruta_informe, sheet_name="Es")
 cruce_cc = pd.read_excel("otros_informes/para_cruzar_6.xlsx")
 
@@ -91,6 +103,7 @@ entradas_medicamentos = pd.pivot_table(entradas_medicamentos, values="DValor", i
 
 #agregar cruce cc
 para_distr_entradas = pd.merge(entradas_medicamentos, cruce_cc, left_on="scc.Nombre", right_on="CENTRO DE COSTO", how="left")
+para_distr_entradas = para_distr_entradas.groupby("CORRECCION").sum().reset_index()
 
 #region Total Medicamentos
 medicamentos = pd.merge(td_distribucion, para_distr_entradas, on="CORRECCION", how="left")
@@ -204,7 +217,7 @@ verificacion = pd.pivot_table(consumo, values="dValor", index='CtaCruce', aggfun
 verificacion_entradas = pd.pivot_table(entradas, values="DValor", index='CtaCruce', aggfunc="sum").reset_index()
 
 try:    
-    with pd.ExcelWriter(f"informes de consumo/Informe de Consumos {mes.capitalize()} de 2025.xlsx") as writer:
+    with pd.ExcelWriter(f"informes de consumo/Informe de Consumos {mes.capitalize()} de {anio}.xlsx") as writer:
         td_total.to_excel(writer, sheet_name="Consumo Medicamentos", index=False)
         total_dispositivos_formulados.to_excel(writer, sheet_name="Dispositivos Medicos", index=False)
         total_dis_de_consumo.to_excel(writer, sheet_name="Dispositivos de Consumo", index=False)

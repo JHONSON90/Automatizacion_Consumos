@@ -35,7 +35,7 @@ def mes_a_abreviatura(mes_completo: str) -> str:
     return MESES_ABREV.get(mes_upper, mes_upper[:3])
 
 
-def buscar_archivo_informe_consumos(mes: str, anio: str = "2025") -> Path:
+def buscar_archivo_informe_consumos(mes: str, anio: str) -> Path:
     """
     Busca el archivo de ENTRADAS (InformeConsumos) correspondiente al mes en Descargas.
     
@@ -47,7 +47,7 @@ def buscar_archivo_informe_consumos(mes: str, anio: str = "2025") -> Path:
     
     Args:
         mes: Nombre del mes completo (ej: "NOVIEMBRE")
-        anio: Año del informe (por defecto "2025")
+        anio: Año del informe (ej: "2025", "2026")
         
     Returns:
         Path al archivo de ENTRADAS encontrado
@@ -66,7 +66,7 @@ def buscar_archivo_informe_consumos(mes: str, anio: str = "2025") -> Path:
     ]
     
     # Patrón del archivo: cualquier cosa-InformeConsumos-MMMYYYY.xlsx
-    patron = f"*-InformeConsumos-{mes_abrev}{anio}.xlsx"
+    patron = f"*-InformeConsumos{mes_abrev}{anio}.xlsx"
     
     for ruta in rutas_busqueda:
         if not ruta.exists():
@@ -118,6 +118,36 @@ def extraer_mes_de_ruta(ruta_archivo: str) -> str:
     fecha_mod = datetime.fromtimestamp(ruta.stat().st_mtime)
     meses_lista = list(MESES.keys())
     return meses_lista[fecha_mod.month - 1].upper()
+
+
+def extraer_anio_de_ruta(ruta_archivo: str) -> str:
+    """
+    Extrae el año de la ruta del archivo analizando la estructura de carpetas.
+    
+    Busca patrones como:
+    - "COSTOS 2025"
+    - "COSTOS 2026"
+    
+    Args:
+        ruta_archivo: Ruta completa del archivo
+        
+    Returns:
+        Año como string (ej: "2025")
+    """
+    ruta = Path(ruta_archivo)
+    
+    # Buscar en las partes de la ruta
+    for parte in ruta.parts:
+        # Patrón: COSTOS XXXX
+        match = re.search(r'COSTOS\s+(\d{4})', parte.upper())
+        if match:
+            return match.group(1)
+            
+    # Si no se encuentra, intentar con la fecha de modificación o año actual
+    try:
+        return str(datetime.fromtimestamp(ruta.stat().st_mtime).year)
+    except:
+        return str(datetime.now().year)
 
 
 def extraer_mes_de_nombre_archivo(nombre_archivo: str) -> str:

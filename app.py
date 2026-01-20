@@ -15,17 +15,17 @@ def main():
     anio = ahora.year
     mes_actual_num = ahora.month
     
-    # Lista de meses a monitorear (actual y siguiente para prevenir traslapes)
+    # Lista de meses a monitorear: actual y 3 meses hacia atrás (para cubrir el retraso de 2 meses)
     meses_info = []
     
-    # Mes actual
-    meses_info.append((anio, mes_actual_num))
-    
-    # Mes siguiente
-    if mes_actual_num == 12:
-        meses_info.append((anio + 1, 1))
-    else:
-        meses_info.append((anio, mes_actual_num + 1))
+    # Calcular meses: actual, -1, -2, -3
+    for i in range(0, -4, -1):
+        m = mes_actual_num + i
+        y = anio
+        while m <= 0:
+            m += 12
+            y -= 1
+        meses_info.append((y, m))
 
     rutas = []
     base_ruta = Path(r"\\192.168.3.70\Costos")
