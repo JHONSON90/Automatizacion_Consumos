@@ -58,18 +58,34 @@ mpios_medicamentos = medicamentos_consumos.loc[medicamentos_consumos['TipDoc4'] 
 
 #region Tablas consumo medicamentos
 para_td1 = pasto_medicamentos[~pasto_medicamentos["scc_Nombre"].isin(["APOYO DIAGNOSTICO", "MEDICINA ESPECIALIZADA", "APOYO TERAPEUTICO"])]
-td1 = para_td1.pivot_table(values="dValor", index="scc_Nombre", aggfunc="sum").reset_index()
+if not para_td1.empty:
+    td1 = para_td1.pivot_table(values="dValor", index="scc_Nombre", aggfunc="sum").reset_index()
+else:
+    td1 = pd.DataFrame(columns=["scc_Nombre", "dValor"])
 
 para_td2 = pasto_medicamentos[pasto_medicamentos["scc_Nombre"].isin(["APOYO DIAGNOSTICO", "MEDICINA ESPECIALIZADA", "APOYO TERAPEUTICO"])]
-td2 = para_td2.pivot_table(values="dValor", index="EspeNom", aggfunc="sum").reset_index()
-td2.columns = ["scc_Nombre", "dValor"]
+if not para_td2.empty:
+    td2 = para_td2.pivot_table(values="dValor", index="EspeNom", aggfunc="sum").reset_index()
+    td2.columns = ["scc_Nombre", "dValor"]
+else:
+    td2 = pd.DataFrame(columns=["scc_Nombre", "dValor"])
 
-td3 = mpios_medicamentos.pivot_table(values="dValor", index='NombreBod', aggfunc="sum").reset_index()
-td3.columns = ["scc_Nombre", "dValor"]
+print(mpios_medicamentos["dValor"].dtype)
+print(mpios_medicamentos["dValor"].isna().sum(), "de", len(mpios_medicamentos))
+if not mpios_medicamentos.empty:
+    td3 = mpios_medicamentos.pivot_table(values="dValor", index='NombreBod', aggfunc="sum").reset_index()
+    print(td3.shape)
+    print(td3.columns.tolist())
+    td3.columns = ["scc_Nombre", "dValor"]
+else:
+    td3 = pd.DataFrame(columns=["scc_Nombre", "dValor"])
 
 para_td4 = consumo.loc[(consumo["Linea"].isin(["MEDICAMENTOS POS", "MEDICAMENTOS NO POS"]))& (consumo['origenMed'] == "SIIGO")]
-td4 = para_td4.pivot_table(values="dValor", index='MedicoNom', aggfunc="sum").reset_index()
-td4.columns = ["scc_Nombre", "dValor"]
+if not para_td4.empty:
+    td4 = para_td4.pivot_table(values="dValor", index='MedicoNom', aggfunc="sum").reset_index()
+    td4.columns = ["scc_Nombre", "dValor"]
+else:
+    td4 = pd.DataFrame(columns=["scc_Nombre", "dValor"])
 
 total_consumo_medicamentos = pd.concat([td1, td2, td3, td4], axis=0, ignore_index=True)
 
@@ -92,14 +108,23 @@ td_distribucion = para_distribucion.pivot_table(values="distribuido", index="COR
 
 #region Entrada Medicamentos
 para_t1_entradas_med = medicamentos_entradas.loc[~medicamentos_entradas["scc.Nombre"].isin(["MEDICINA ESPECIALIZADA", "PASTO"]) ]
-t1_entradas_med = para_t1_entradas_med.pivot_table(values="DValor", index="scc.Nombre", aggfunc="sum").reset_index()
+if not para_t1_entradas_med.empty:
+    t1_entradas_med = para_t1_entradas_med.pivot_table(values="DValor", index="scc.Nombre", aggfunc="sum").reset_index()
+else:
+    t1_entradas_med = pd.DataFrame(columns=["scc.Nombre", "DValor"])
 
 para_t2_entradas_med = medicamentos_entradas.loc[medicamentos_entradas["scc.Nombre"].isin(["MEDICINA ESPECIALIZADA", "PASTO"]) ]
-t2_entradas_med = para_t2_entradas_med.pivot_table(values="DValor", index="EspeNom", aggfunc="sum").reset_index()
-t2_entradas_med.columns = ["scc.Nombre", "DValor"]
+if not para_t2_entradas_med.empty:
+    t2_entradas_med = para_t2_entradas_med.pivot_table(values="DValor", index="EspeNom", aggfunc="sum").reset_index()
+    t2_entradas_med.columns = ["scc.Nombre", "DValor"]
+else:
+    t2_entradas_med = pd.DataFrame(columns=["scc.Nombre", "DValor"])
 
 entradas_medicamentos = pd.concat([t1_entradas_med, t2_entradas_med], axis=0, ignore_index=True)
-entradas_medicamentos = pd.pivot_table(entradas_medicamentos, values="DValor", index="scc.Nombre", aggfunc="sum").reset_index()
+if not entradas_medicamentos.empty:
+    entradas_medicamentos = pd.pivot_table(entradas_medicamentos, values="DValor", index="scc.Nombre", aggfunc="sum").reset_index()
+else:
+    entradas_medicamentos = pd.DataFrame(columns=["scc.Nombre", "DValor"])
 
 #agregar cruce cc
 para_distr_entradas = pd.merge(entradas_medicamentos, cruce_cc, left_on="scc.Nombre", right_on="CENTRO DE COSTO", how="left")
@@ -139,17 +164,24 @@ mpios_dispositivos = dispositivos_consumo.loc[dispositivos_consumo['TipDoc4'] ==
 print(pasto_dispositivos.dValor.sum() + mpios_dispositivos.dValor.sum())
 
 para_td1_dispositivos = pasto_dispositivos[~pasto_dispositivos["scc_Nombre"].isin(["APOYO DIAGNOSTICO", "MEDICINA ESPECIALIZADA", "APOYO TERAPEUTICO"])]
-td1_dispositivos = para_td1_dispositivos.pivot_table(values="dValor", index="scc_Nombre", aggfunc="sum").reset_index()
-td1_dispositivos.columns = ["scc_Nombre", "dValor"]
+if not para_td1_dispositivos.empty:
+    td1_dispositivos = para_td1_dispositivos.pivot_table(values="dValor", index="scc_Nombre", aggfunc="sum").reset_index()
+    td1_dispositivos.columns = ["scc_Nombre", "dValor"]
+else:
+    td1_dispositivos = pd.DataFrame(columns=["scc_Nombre", "dValor"])
 
 para_td2_dispositivos = pasto_dispositivos[pasto_dispositivos["scc_Nombre"].isin(["APOYO DIAGNOSTICO", "MEDICINA ESPECIALIZADA", "APOYO TERAPEUTICO"])]
-td2_dispositivos = para_td2_dispositivos.pivot_table(values="dValor", index="EspeNom", aggfunc="sum").reset_index()
-td2_dispositivos.columns = ["scc_Nombre", "dValor"]
+if not para_td2_dispositivos.empty:
+    td2_dispositivos = para_td2_dispositivos.pivot_table(values="dValor", index="EspeNom", aggfunc="sum").reset_index()
+    td2_dispositivos.columns = ["scc_Nombre", "dValor"]
+else:
+    td2_dispositivos = pd.DataFrame(columns=["scc_Nombre", "dValor"])
 
-
-para_td3_dispositivos = mpios_dispositivos.pivot_table(values="dValor", index='NombreBod', aggfunc="sum").reset_index()
-td3_dispositivos = para_td3_dispositivos.pivot_table(values="dValor", index='NombreBod', aggfunc="sum").reset_index()
-td3_dispositivos.columns = ["scc_Nombre", "dValor"]
+if not mpios_dispositivos.empty:
+    td3_dispositivos = mpios_dispositivos.pivot_table(values="dValor", index='NombreBod', aggfunc="sum").reset_index()
+    td3_dispositivos.columns = ["scc_Nombre", "dValor"]
+else:
+    td3_dispositivos = pd.DataFrame(columns=["scc_Nombre", "dValor"])
 
 print(td1_dispositivos.dValor.sum() + td2_dispositivos.dValor.sum() + td3_dispositivos.dValor.sum())
 
@@ -171,9 +203,16 @@ print(dispositivos_entradas.DValor.sum())
 para_entrada_dispo = dispositivos_entradas.loc[~dispositivos_entradas['scc.Nombre'].isin(["MEDICINA ESPECIALIZADA", "PASTO"]) ]
 para_entrada_dispo2 = dispositivos_entradas.loc[dispositivos_entradas['scc.Nombre'].isin(["MEDICINA ESPECIALIZADA", "PASTO"]) ]
 
-td1_entrada_dispo = para_entrada_dispo.pivot_table(values="DValor", index="scc.Nombre", aggfunc="sum").reset_index()
-td2_entrada_dispo = para_entrada_dispo2.pivot_table(values="DValor", index="EspeNom", aggfunc="sum").reset_index()
-td2_entrada_dispo.columns = ["scc.Nombre", "DValor"]
+if not para_entrada_dispo.empty:
+    td1_entrada_dispo = para_entrada_dispo.pivot_table(values="DValor", index="scc.Nombre", aggfunc="sum").reset_index()
+else:
+    td1_entrada_dispo = pd.DataFrame(columns=["scc.Nombre", "DValor"])
+
+if not para_entrada_dispo2.empty:
+    td2_entrada_dispo = para_entrada_dispo2.pivot_table(values="DValor", index="EspeNom", aggfunc="sum").reset_index()
+    td2_entrada_dispo.columns = ["scc.Nombre", "DValor"]
+else:
+    td2_entrada_dispo = pd.DataFrame(columns=["scc.Nombre", "DValor"])
 
 entrada_dispositivos = pd.concat([td1_entrada_dispo, td2_entrada_dispo], axis=0, ignore_index=True)
 
@@ -200,18 +239,24 @@ total_dispositivos_formulados = dispositivos_formulados.pivot_table(values="Tota
 
 dispositivos_de_consumo = consumo.loc[(~consumo["Linea"].isin(["MEDICAMENTOS POS", "MEDICAMENTOS NO POS"]))& (consumo['origenMed'] == "SIIGO") & (~consumo['BOD4'].isin([3,9901,9902,9903,9904]))].copy()
 
-dispositivos_de_consumo["dValor"] = dispositivos_de_consumo["dValor"].astype(int)
-total_dis_de_consumo = pd.pivot_table(dispositivos_de_consumo, values="dValor", index="MedicoNom", aggfunc="sum").reset_index()
-total_dis_de_consumo.columns = ["MedicoNom", "dValor"]
+if not dispositivos_de_consumo.empty:
+    dispositivos_de_consumo["dValor"] = dispositivos_de_consumo["dValor"].astype(int)
+    total_dis_de_consumo = pd.pivot_table(dispositivos_de_consumo, values="dValor", index="MedicoNom", aggfunc="sum").reset_index()
+    total_dis_de_consumo.columns = ["MedicoNom", "dValor"]
+else:
+    total_dis_de_consumo = pd.DataFrame(columns=["MedicoNom", "dValor"])
 
 
 
 #region insumos
 insumos = consumo.loc[(~consumo["Linea"].isin(["MEDICAMENTOS POS", "MEDICAMENTOS NO POS"])) & (consumo['origenMed'] == "SIIGO") & (consumo['BOD4'].isin([3,9901,9902,9903,9904]))].copy()
 
-insumos["dValor"] = insumos["dValor"].astype(int)
-total_insumos = pd.pivot_table(insumos, values="dValor", index="MedicoNom", aggfunc="sum").reset_index()
-total_insumos.columns = ["MedicoNom", "dValor"]
+if not insumos.empty:
+    insumos["dValor"] = insumos["dValor"].astype(int)
+    total_insumos = pd.pivot_table(insumos, values="dValor", index="MedicoNom", aggfunc="sum").reset_index()
+    total_insumos.columns = ["MedicoNom", "dValor"]
+else:
+    total_insumos = pd.DataFrame(columns=["MedicoNom", "dValor"])
 
 verificacion = pd.pivot_table(consumo, values="dValor", index='CtaCruce', aggfunc="sum").reset_index()
 verificacion_entradas = pd.pivot_table(entradas, values="DValor", index='CtaCruce', aggfunc="sum").reset_index()

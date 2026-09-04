@@ -66,7 +66,7 @@ def buscar_archivo_informe_consumos(mes: str, anio: str) -> Path:
     ]
     
     # Patrón del archivo: cualquier cosa-InformeConsumos-MMMYYYY.xlsx
-    patron = f"*-InformeConsumos{mes_abrev}{anio}.xlsx"
+    patron = f"*-InformeConsumos-{mes_abrev}{anio}.xlsx"
     
     for ruta in rutas_busqueda:
         if not ruta.exists():

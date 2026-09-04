@@ -185,7 +185,7 @@ compras = pd.read_excel(ruta_compras)
 
 compras = compras.groupby('codigo')["valor unitario"].mean()
 
-precios_unitarios = origen.groupby(["COD13", 'Producto']).agg(
+precios_unitarios = origen.groupby(['TipDoc4','DescTipDoc', 'NroMov', 'BOD4', 'NombreBod',"COD13", 'Producto']).agg(
       suma_cantidad = ("dCantidad", 'sum'),
       suma_valor = ('dValor', 'sum')
 ).reset_index()
@@ -200,7 +200,7 @@ unidos['desviacion'] = (((unidos["valor unitario"] - unidos['Valor Unitario']) /
 UMBRAL = 20
 
 desfasados = unidos[np.abs(unidos['desviacion']) > UMBRAL]
-desfasados = desfasados[['COD13', 'Producto']]
+desfasados = desfasados[['TipDoc4','DescTipDoc', 'NroMov', 'BOD4', 'NombreBod',"COD13", 'Producto', "valor unitario", "Valor Unitario", "desviacion"]]
 
 print(desfasados.head(10))
 
